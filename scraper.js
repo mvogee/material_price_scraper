@@ -5,7 +5,7 @@ const jsdom = require('jsdom');
 const {JSDOM } = jsdom;
 
 /**
-  * 
+  *
   * @param {String} url - the url to be fetched from
   *
   */
@@ -13,7 +13,7 @@ async function getPage(url) {
     // use fetch and get a url
     const response = await fetch(url);
     const text = await response.text();
-    
+
     return (text);
 };
 
@@ -32,8 +32,17 @@ function subCategoryList(list) {
     return catList;
 };
 
+function elementTextorNull(element) {
+  if (element) {
+    return element.textContent;
+  }
+  else {
+    return null;
+  }
+}
+
 /**
-  * 
+  *
   * @param {String} page - the html in plain text to be parsed
   *
   */
@@ -41,14 +50,14 @@ async function parsePagePlatt(page) {
     try {
         const {document} = await new JSDOM(page).window;
         const product = {
-            
-            headline: document.querySelector(".lblProdHeadline").textContent,
-            category: document.querySelector(".crumbSecond span").textContent,
+
+            headline: elementTextorNull(document.querySelector(".lblProdHeadline")),
+            category: elementTextorNull(document.querySelector(".crumbSecond span")),
             subCategorys: subCategoryList(document.querySelectorAll(".crumbOther span")),
-            manufacturer: document.querySelector(".ManLink a").textContent,
-            price: document.querySelector(".ProductPrice") ? document.querySelector(".ProductPrice").textContent : "na",
-            detailDescription: document.querySelector("#lblDetailDes").textContent,
-            plattItemId: document.querySelector(".ProductID").textContent,
+            manufacturer: elementTextorNull(document.querySelector(".ManLink a")),
+            price: elementTextorNull(document.querySelector(".ProductPrice")),
+            detailDescription: elementTextorNull(document.querySelector("#lblDetailDes")),
+            plattItemId: elementTextorNull(document.querySelector(".ProductID")),
         }
         console.log(product);
         return product;
@@ -68,7 +77,7 @@ module.exports = async function() {
     // run the scraping here
     //let urls = ['https://www.platt.com/search.aspx?q=1438434', 'https://www.platt.com/search.aspx?q=0052181', 'https://www.platt.com/search.aspx?q=867023', 'https://www.platt.com/search.aspx?q=0572325'];
     try {
-        for (i = 1438438; i < 1438439 + 1; i++) {
+        for (i = 1; i < 50; i++) {
             console.log("your url:" + getUrl(i));
             var url = getUrl(i);
             const page = await getPage(url);
