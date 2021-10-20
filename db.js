@@ -9,4 +9,69 @@ var pool = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
-exports.pool = pool;
+
+
+function doesrowExist(platt_id) {
+  let sql = "SELECT id FROM platt_products WHERE platt_id=?;";
+  pool.query(sql, platt_id, (err, result) => {
+    if (result) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  });
+};
+
+/**
+* @param {object} plattObj should be a plattObj created by parsePagePlatt function.
+*/
+function addPlattitm(plattObj) {
+  console.log(plattObj.subCategorys.length);
+  let sql = "INSERT INTO platt_products (platt_id, headline, category, sub_category_one, sub_category_two, sub_category_three, manufacturer, price, description, date_updated) VALUES(?,?,?,?,?,?,?,?,?,?);";
+  pool.query(mysql, [
+    plattObj.platt_id,
+    plattObj.headline,
+    plattObj.category,
+    plattObj.subCategorys.length >= 1 ? platt.subCategorys[0] : null,
+    plattObj.subCategorys.length >= 2 ? platt.subCategory[1] : null,
+    plattObj.subCategorys.length >= 3 ? platt.subCategory[2] : null,
+    plattObj.manufacturer,
+    plattObj.price,
+    plattObj.description,
+    plattObj.date_updated
+    ],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(result);
+  });
+};
+
+function updatePlattitm(plattObj) {
+  let sql = "UPDATE platt_products SET headline=?, manufacturer=?, price=?, description=?, date_updated=? WHERE platt_id=?;";
+  pool.query(sql, [plattObj.headline,
+    plattObj.manufacturer,
+    plattObj.price,
+    plattObj.description,
+    plattObj.date_updated,
+    plattObj.platt_id],
+  (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log(result);
+  });
+};
+
+function plattItm(plattObj) {
+  if (doesrowExist(plattObj.platt_id)) {
+    updatePlattItm(plattObj);
+  }
+  else {
+    addPlattitm(plattObj);
+  }
+}
+
+exports.plattItm = plattItm;

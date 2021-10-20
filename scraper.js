@@ -1,7 +1,7 @@
-const mysql = require("./db.js").pool;
 const fetch = require('isomorphic-fetch');
 const jsdom = require('jsdom');
-const {JSDOM } = jsdom;
+const { JSDOM } = jsdom;
+const plattItm = require("./db.js").plattItm;
 const itterStart = 1;
 const itterEnd = 52181;
 
@@ -46,8 +46,7 @@ async function parsePagePlatt(page) {
         if (!document.querySelector(".ProductID")) {
           return null;
         }
-        const product = {
-
+        const plattObj = {
             headline: elementTextorNull(document.querySelector(".lblProdHeadline")),
             category: elementTextorNull(document.querySelector(".crumbSecond span")),
             subCategorys: subCategoryList(document.querySelectorAll(".crumbOther span")),
@@ -55,13 +54,14 @@ async function parsePagePlatt(page) {
             price: elementTextorNull(document.querySelector(".ProductPrice")),
             detailDescription: elementTextorNull(document.querySelector("#lblDetailDes")),
             plattItemId: elementTextorNull(document.querySelector(".ProductID")),
-            last_updated: new Date()
+            date_updated: new Date()
         }
-        console.log(product);
-        return product;
+        console.log(plattObj);
+        return plattObj;
     }
     catch (e){
         console.log("An error orccured: " + e + "in ");
+        return null;
     }
 };
 
@@ -80,9 +80,13 @@ module.exports = async function() {
             var url = getUrl(i);
             const page = await getPage(url);
             try {
-                if (!await parsePagePlatt(page)) {
-                  console.log(url + " is not a product.");
-                };
+                let plattObj = await parsePagePlatt(page);
+                if (plattObj) {
+                  plattItm(plattObj);
+                }
+                else {
+                  console.log(url + " is not a product");
+                }
             }
             catch (e) {
                 console.log("something went wrong on url:" + url + ": error message: " + e)
