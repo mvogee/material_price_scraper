@@ -3,6 +3,8 @@
 const fetch = require('isomorphic-fetch');
 const jsdom = require('jsdom');
 const {JSDOM } = jsdom;
+const itterStart = 1;
+const itterEnd = 52181;
 
 /**
   *
@@ -18,16 +20,9 @@ async function getPage(url) {
 };
 
 function subCategoryList(list) {
-    let catList = "";
-    let firstIt = true;
+    let catList = [];
     list.forEach(element => {
-        if (firstIt) {
-            catList += element.textContent;
-            firstIt = false;
-        }
-        else {
-            catList += ", " + element.textContent;
-        }
+      catList.push(element.textContent);
     });
     return catList;
 };
@@ -49,6 +44,9 @@ function elementTextorNull(element) {
 async function parsePagePlatt(page) {
     try {
         const {document} = await new JSDOM(page).window;
+        if (!document.querySelector(".ProductID")) {
+          return null;
+        }
         const product = {
 
             headline: elementTextorNull(document.querySelector(".lblProdHeadline")),
@@ -58,6 +56,7 @@ async function parsePagePlatt(page) {
             price: elementTextorNull(document.querySelector(".ProductPrice")),
             detailDescription: elementTextorNull(document.querySelector("#lblDetailDes")),
             plattItemId: elementTextorNull(document.querySelector(".ProductID")),
+            last_updated: new Date()
         }
         console.log(product);
         return product;
@@ -77,12 +76,14 @@ module.exports = async function() {
     // run the scraping here
     //let urls = ['https://www.platt.com/search.aspx?q=1438434', 'https://www.platt.com/search.aspx?q=0052181', 'https://www.platt.com/search.aspx?q=867023', 'https://www.platt.com/search.aspx?q=0572325'];
     try {
-        for (i = 1; i < 50; i++) {
+        for (i = itterStart; i < itterEnd; i++) {
             console.log("your url:" + getUrl(i));
             var url = getUrl(i);
             const page = await getPage(url);
             try {
-                parsePagePlatt(page);
+                if (!await parsePagePlatt(page)) {
+                  console.log(url + " is not a product.");
+                };
             }
             catch (e) {
                 console.log("something went wrong on url:" + url + ": error message: " + e)
