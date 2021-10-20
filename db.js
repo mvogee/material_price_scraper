@@ -29,8 +29,8 @@ function doesrowExist(platt_id) {
 function addPlattitm(plattObj) {
   console.log(plattObj.subCategorys.length);
   let sql = "INSERT INTO platt_products (platt_id, headline, category, sub_category_one, sub_category_two, sub_category_three, manufacturer, price, description, date_updated) VALUES(?,?,?,?,?,?,?,?,?,?);";
-  pool.query(mysql, [
-    plattObj.platt_id,
+  pool.query(sql, [
+    plattObj.plattItemId,
     plattObj.headline,
     plattObj.category,
     plattObj.subCategorys.length >= 1 ? platt.subCategorys[0] : null,
@@ -56,7 +56,7 @@ function updatePlattitm(plattObj) {
     plattObj.price,
     plattObj.description,
     plattObj.date_updated,
-    plattObj.platt_id],
+    plattObj.plattItemId],
   (err, result) => {
     if (err) {
       console.log(err);
@@ -66,7 +66,7 @@ function updatePlattitm(plattObj) {
 };
 
 function plattItm(plattObj) {
-  if (doesrowExist(plattObj.platt_id)) {
+  if (doesrowExist(plattObj.plattItemId)) {
     updatePlattItm(plattObj);
   }
   else {
