@@ -1,5 +1,4 @@
-// get the html in plain text
-// parse through the html grabbing the specific items you want
+const mysql = require("./db.js").pool;
 const fetch = require('isomorphic-fetch');
 const jsdom = require('jsdom');
 const {JSDOM } = jsdom;
