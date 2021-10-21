@@ -11,13 +11,16 @@ var pool = mysql.createPool({
 
 
 
-function doesrowExist(platt_id) {
+async function doesrowExist(platt_id) {
   let sql = "SELECT id FROM platt_products WHERE platt_id=?;";
-  pool.query(sql, platt_id, (err, result) => {
+  result=pool.query(sql, platt_id, (err, result) => {
+    console.log("result here: " + result);
     if (result) {
+      console.log("true");
       return true;
     }
     else {
+      console.log("false");
       return false;
     }
   });
@@ -27,7 +30,7 @@ function doesrowExist(platt_id) {
 * @param {object} plattObj should be a plattObj created by parsePagePlatt function.
 */
 function addPlattitm(plattObj) {
-  console.log(plattObj.subCategorys.length);
+  console.log("New platt item being added.");
   let sql = "INSERT INTO platt_products (platt_id, headline, category, sub_category_one, sub_category_two, sub_category_three, manufacturer, price, description, date_updated) VALUES(?,?,?,?,?,?,?,?,?,?);";
   pool.query(sql, [
     plattObj.plattItemId,
@@ -49,7 +52,8 @@ function addPlattitm(plattObj) {
   });
 };
 
-function updatePlattitm(plattObj) {
+function updatePlattItm(plattObj) {
+  console.log("Updating platt item.");
   let sql = "UPDATE platt_products SET headline=?, manufacturer=?, price=?, description=?, date_updated=? WHERE platt_id=?;";
   pool.query(sql, [plattObj.headline,
     plattObj.manufacturer,
@@ -66,12 +70,18 @@ function updatePlattitm(plattObj) {
 };
 
 function plattItm(plattObj) {
-  if (doesrowExist(plattObj.plattItemId)) {
-    updatePlattItm(plattObj);
-  }
-  else {
-    addPlattitm(plattObj);
-  }
+  let sql = "SELECT id FROM platt_products WHERE platt_id=?;";
+  result=pool.query(sql, plattObj.plattItemId, (err, result) => {
+    console.log(result);
+    if (result.length >= 1) {
+      console.log("updating existing platt product");
+      updatePlattItm(plattObj);
+    }
+    else {
+      console.log("adding new platt pdoruct");
+      addPlattitm(plattObj);
+    }
+  });
 }
 
 exports.plattItm = plattItm;

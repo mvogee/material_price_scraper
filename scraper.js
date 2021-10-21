@@ -72,7 +72,6 @@ function getUrl(i) {
 };
 
 module.exports = async function() {
-    // run the scraping here
     //let urls = ['https://www.platt.com/search.aspx?q=1438434', 'https://www.platt.com/search.aspx?q=0052181', 'https://www.platt.com/search.aspx?q=867023', 'https://www.platt.com/search.aspx?q=0572325'];
     try {
         for (i = itterStart; i < itterEnd; i++) {
