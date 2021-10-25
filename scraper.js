@@ -107,13 +107,18 @@ module.exports = async function() {
         for (i = itterStart; i < itterEnd; i++) {
             console.log("your url:" + getUrl(i));
             var url = getUrl(i);
-            await page.goto(url);
+            try {
+              await page.goto(url);
+            }
+            catch {
+              console.log("error orrcued going to a page");
+            }
             try {
                 let plattObj = await parsePagePlatt(page);
                 if (plattObj) {
                   console.log("adding item to db");
                   console.log(plattObj);
-                 // plattItm(plattObj); // Uncomment when ready to use database again.
+                  plattItm(plattObj);
                 }
                 else {
                   console.log(url + " is not a product");

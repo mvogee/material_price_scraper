@@ -41,7 +41,7 @@ function addPlattitm(plattObj) {
     plattObj.subCategorys.length >= 3 ? plattObj.subCategorys[2] : null,
     plattObj.manufacturer,
     plattObj.price,
-    plattObj.description,
+    plattObj.detailDescription,
     plattObj.date_updated
     ],
     (err, result) => {
@@ -58,7 +58,7 @@ function updatePlattItm(plattObj) {
   pool.query(sql, [plattObj.headline,
     plattObj.manufacturer,
     plattObj.price,
-    plattObj.description,
+    plattObj.detailDescription,
     plattObj.date_updated,
     plattObj.plattItemId],
   (err, result) => {
