@@ -5,7 +5,7 @@ const fetch = require('isomorphic-fetch');
 const puppeteer = require('puppeteer');
 const plattItm = require("./db.js").plattItm;
 
-const itterStart = 1;
+const itterStart = 2091;
 const itterEnd = 52181;
 
 
@@ -29,25 +29,41 @@ async function subCategoryList(page, selector) {
 
 function cb(selector, document) {
   return Array.from(document.querySelectorAll(selector), element => element.textContent);
-}
+};
 
 /**
  * 
  * @param {puppeteer.page} page The page you are querying
  * @param {String} selector The selector you would like to query.
- * @returns the element or null if the element does not exist 
+ * @returns the element.textContent or null if the element does not exist 
  */
  async function getElementOrNull(page, selector) {
   try {
     let el = await page.$eval(selector, el => el.textContent);
-   // console.log("found element " + el);
     return el;
   }
   catch {
     console.log("caught error: no selector- " + selector + " found.");
     return null;
   }
-}
+};
+
+/**
+ * 
+ * @param {puppeteer.page} page The page you are querying
+ * @param {String} selector The selector you would like to query.
+ * @returns the string of the image link or null if the element does not exist 
+ */
+async function getImgLinkOrNull(page, selector) {
+  try {
+    let el = await page.$eval(selector, el => el.src);
+    return el;
+  }
+  catch {
+    console.log("caught error: no selector- " + selector + " found.");
+    return null;
+  }
+};
 
 /**
   *
@@ -69,7 +85,8 @@ async function parsePagePlatt(page) {
             price: await getElementOrNull(page, ".ProductPrice"),
             detailDescription: await getElementOrNull(page, "#lblDetailDes"),
             plattItemId: await getElementOrNull(page,".ProductID"),
-            date_updated: new Date()
+            date_updated: new Date(),
+            img_link: await getImgLinkOrNull(page, "#ctl00_ctl00_MainContent_uxProduct_CatalogItemImage")
         }
         return plattObj;
     }
@@ -110,15 +127,15 @@ module.exports = async function() {
             try {
               await page.goto(url);
             }
-            catch {
-              console.log("error orrcued going to a page");
+            catch (e) {
+              console.log("error orrcued going to a page. Message: " + e);
             }
             try {
                 let plattObj = await parsePagePlatt(page);
                 if (plattObj) {
                   console.log("adding item to db");
                   console.log(plattObj);
-                  plattItm(plattObj);
+                  //plattItm(plattObj);
                 }
                 else {
                   console.log(url + " is not a product");
