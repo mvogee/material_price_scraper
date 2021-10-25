@@ -31,7 +31,7 @@ async function doesrowExist(platt_id) {
 */
 function addPlattitm(plattObj) {
   console.log("New platt item being added.");
-  let sql = "INSERT INTO platt_products (platt_id, headline, category, sub_category_one, sub_category_two, sub_category_three, manufacturer, price, description, date_updated) VALUES(?,?,?,?,?,?,?,?,?,?);";
+  let sql = "INSERT INTO platt_products (platt_id, headline, category, sub_category_one, sub_category_two, sub_category_three, manufacturer, price, description, date_updated, img_link, also_known_as) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);";
   pool.query(sql, [
     plattObj.plattItemId,
     plattObj.headline,
@@ -42,7 +42,9 @@ function addPlattitm(plattObj) {
     plattObj.manufacturer,
     plattObj.price,
     plattObj.detailDescription,
-    plattObj.date_updated
+    plattObj.date_updated,
+    plattObj.img_link,
+    plattObj.alsoKnownAs
     ],
     (err, result) => {
       if (err) {
@@ -54,12 +56,14 @@ function addPlattitm(plattObj) {
 
 function updatePlattItm(plattObj) {
   console.log("Updating platt item.");
-  let sql = "UPDATE platt_products SET headline=?, manufacturer=?, price=?, description=?, date_updated=? WHERE platt_id=?;";
+  let sql = "UPDATE platt_products SET headline=?, manufacturer=?, price=?, description=?, date_updated=?, img_link=?, also_known_as=? WHERE platt_id=?;";
   pool.query(sql, [plattObj.headline,
     plattObj.manufacturer,
     plattObj.price,
     plattObj.detailDescription,
     plattObj.date_updated,
+    plattObj.img_link,
+    plattObj.alsoKnownAs,
     plattObj.plattItemId],
   (err, result) => {
     if (err) {

@@ -5,7 +5,7 @@ const fetch = require('isomorphic-fetch');
 const puppeteer = require('puppeteer');
 const plattItm = require("./db.js").plattItm;
 
-const itterStart = 2091;
+const itterStart = 1;
 const itterEnd = 52181;
 
 
@@ -86,7 +86,8 @@ async function parsePagePlatt(page) {
             detailDescription: await getElementOrNull(page, "#lblDetailDes"),
             plattItemId: await getElementOrNull(page,".ProductID"),
             date_updated: new Date(),
-            img_link: await getImgLinkOrNull(page, "#ctl00_ctl00_MainContent_uxProduct_CatalogItemImage")
+            img_link: await getImgLinkOrNull(page, "#ctl00_ctl00_MainContent_uxProduct_CatalogItemImage"),
+            alsoKnownAs: await getElementOrNull(page, "#ctl00_ctl00_MainContent_uxProduct_lblSEOAlsoKnow")
         }
         return plattObj;
     }
@@ -135,7 +136,7 @@ module.exports = async function() {
                 if (plattObj) {
                   console.log("adding item to db");
                   console.log(plattObj);
-                  //plattItm(plattObj);
+                  plattItm(plattObj);
                 }
                 else {
                   console.log(url + " is not a product");
