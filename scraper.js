@@ -5,7 +5,7 @@ const fetch = require('isomorphic-fetch');
 const puppeteer = require('puppeteer');
 const plattItm = require("./db.js").plattItm;
 
-const itterStart = 1;
+const itterStart = 10000;
 const itterEnd = 52181;
 
 
@@ -74,7 +74,6 @@ async function parsePagePlatt(page) {
     try {
         if (!await getElementOrNull(page, ".ProductID"))
         {
-          console.log("element doesnt exist returning null.")
           return null;
         }
         const plattObj = {

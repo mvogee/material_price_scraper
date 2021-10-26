@@ -41,7 +41,7 @@ function addPlattitm(plattObj) {
     plattObj.subCategorys.length >= 3 ? plattObj.subCategorys[2] : null,
     plattObj.manufacturer,
     plattObj.price,
-    plattObj.detailDescription,
+    plattObj.detailDescription.length < 1020 ? plattObj.detailDescription : plattObj.detailDescription.substring(0, 1020) ,
     plattObj.date_updated,
     plattObj.img_link,
     plattObj.alsoKnownAs
