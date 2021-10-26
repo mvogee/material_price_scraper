@@ -5,7 +5,7 @@ const fetch = require('isomorphic-fetch');
 const puppeteer = require('puppeteer');
 const plattItm = require("./db.js").plattItm;
 
-const itterStart = 10000;
+const itterStart = 48823;
 const itterEnd = 52181;
 
 
