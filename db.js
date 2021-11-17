@@ -31,7 +31,7 @@ async function doesrowExist(platt_id) {
 */
 function addPlattitm(plattObj) {
   console.log("New platt item being added.");
-  let sql = "INSERT INTO platt_products (platt_id, headline, category, sub_category_one, sub_category_two, sub_category_three, manufacturer, price, description, date_updated, img_link, also_known_as) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);";
+  let sql = "INSERT INTO platt_products (platt_id, headline, category, sub_category_one, sub_category_two, sub_category_three, manufacturer, price, description, date_updated, img_link, also_known_as, upc) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
   pool.query(sql, [
     plattObj.plattItemId,
     plattObj.headline,
@@ -44,7 +44,8 @@ function addPlattitm(plattObj) {
     plattObj.detailDescription.length < 1020 ? plattObj.detailDescription : plattObj.detailDescription.substring(0, 1020) ,
     plattObj.date_updated,
     plattObj.img_link,
-    plattObj.alsoKnownAs
+    plattObj.alsoKnownAs,
+    plattObj.upc
     ],
     (err, result) => {
       if (err) {
@@ -79,11 +80,11 @@ function plattItm(plattObj) {
     console.log(result);
     if (result.length >= 1) {
       console.log("updating existing platt product");
-      updatePlattItm(plattObj);
+      //updatePlattItm(plattObj);
     }
     else {
       console.log("adding new platt pdoruct");
-      addPlattitm(plattObj);
+     // addPlattitm(plattObj);
     }
   });
 }

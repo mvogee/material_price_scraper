@@ -5,8 +5,10 @@ const fetch = require('isomorphic-fetch');
 const puppeteer = require('puppeteer');
 const plattItm = require("./db.js").plattItm;
 
-const itterStart = 48823;
-const itterEnd = 52181;
+
+
+const itterStart = 145242;
+const itterEnd = 200000;
 
 
 const loginUrl = "https://www.platt.com/login.aspx";
@@ -86,7 +88,8 @@ async function parsePagePlatt(page) {
             plattItemId: await getElementOrNull(page,".ProductID"),
             date_updated: new Date(),
             img_link: await getImgLinkOrNull(page, "#ctl00_ctl00_MainContent_uxProduct_CatalogItemImage"),
-            alsoKnownAs: await getElementOrNull(page, "#ctl00_ctl00_MainContent_uxProduct_lblSEOAlsoKnow")
+            alsoKnownAs: await getElementOrNull(page, "#ctl00_ctl00_MainContent_uxProduct_lblSEOAlsoKnow"),
+            upc: await getElementOrNull(page, ".lblUPC")
         }
         return plattObj;
     }
@@ -102,8 +105,9 @@ function getUrl(i) {
     return (baseurl + prodNum);
 };
 
-async function log_in_platt() {
-  const browser = await puppeteer.launch();
+async function log_in_platt(browser) {
+  try {
+  
   const page = await browser.newPage();
   await page.goto(loginUrl);
   await page.type("#ctl00_ctl00_MainContent_uxLogin_uxLogin_AccountNumber", process.env.PLATT_ACC_NUM);
@@ -115,20 +119,36 @@ async function log_in_platt() {
   const loggedInPage = await browser.newPage();
   await loggedInPage.setCookie(...cookies);
   return loggedInPage;
+  }
+  catch {
+    return null;
+  }
 }
 
 module.exports = async function() {
-    //let urls = ['https://www.platt.com/search.aspx?q=1438434', 'https://www.platt.com/search.aspx?q=0052181', 'https://www.platt.com/search.aspx?q=867023', 'https://www.platt.com/search.aspx?q=0572325'];
-    const page = await log_in_platt();
+    const browser = await puppeteer.launch();
+    const page = await log_in_platt(browser);
+    let failCount = 0;
+    if (!page) {
+      console.log("failed to open browser");
+      return null;
+    }
     try {
-        for (i = itterStart; i < itterEnd; i++) {
+        for (i = itterStart; i <= itterEnd; i++) {
             console.log("your url:" + getUrl(i));
             var url = getUrl(i);
             try {
               await page.goto(url);
+              failCount = 0;
             }
             catch (e) {
               console.log("error orrcued going to a page. Message: " + e);
+              failCount++;
+              if (failCount > 10) {
+                console.log("loading page has failed 10 times in a row. please check. closing broser");
+                browser.close();
+                return ;
+              }
             }
             try {
                 let plattObj = await parsePagePlatt(page);
