@@ -80,11 +80,11 @@ function plattItm(plattObj) {
     console.log(result);
     if (result.length >= 1) {
       console.log("updating existing platt product");
-      //updatePlattItm(plattObj);
+      updatePlattItm(plattObj);
     }
     else {
-      console.log("adding new platt pdoruct");
-     // addPlattitm(plattObj);
+      console.log("adding new platt product");
+      addPlattitm(plattObj);
     }
   });
 }
