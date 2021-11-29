@@ -143,11 +143,16 @@ module.exports = async function(itterStart, itterEnd) {
             catch (e) {
               console.log("error orrcued going to a page. Message: " + e);
               failCount++;
-              if (failCount > 10) {
+              if (failCount >= 6) {
+                // failed more than 6 times. try the next url.
+                continue;
+              }
+              else if (failCount > 10) {
                 console.log("loading page has failed 10 times in a row. please check. closing broser");
                 browser.close();
                 return i;
               }
+              // hasnt failed 6 times yet. trying same url.
               i--;
               continue;
             }
