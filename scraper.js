@@ -108,6 +108,16 @@ async function log_in_platt(browser) {
   try {
     console.log("logging in to platt");
     const page = await browser.newPage();
+    await page.setRequestInterception(true);
+    // disable css fonts and images from loading
+    page.on('request', (req) => {
+      if (req.resourceType() === 'stylesheet' || req.resourceType() === 'font' || req.resourceType() === 'image') {
+        req.abort();
+      }
+      else {
+        req.continue();
+      }
+    });
     await page.goto(loginUrl);
     await page.type("#ctl00_ctl00_MainContent_uxLogin_uxLogin_AccountNumber", process.env.PLATT_ACC_NUM);
     await page.type("#ctl00_ctl00_MainContent_uxLogin_uxLogin_Username", process.env.PLATT_USER);
@@ -117,6 +127,15 @@ async function log_in_platt(browser) {
     const cookies = await page.cookies();
     const loggedInPage = await browser.newPage();
     await loggedInPage.setCookie(...cookies);
+    // after logging in disable javascript and scripts from loading to speed up page loads
+    page.on('request', (req) => {
+      if (req.recourceType() === 'script') {
+        req.abort();
+      }
+      else {
+        req.continue();
+      }
+    });
     return loggedInPage;
   }
   catch {
