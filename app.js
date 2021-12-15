@@ -10,7 +10,7 @@ const itterEnd = 200000;
 
 app.listen(port, async () => {
     console.log("server is live.");
-    for(i = 0; i < 3; i++) {
+    for(let fails = 0; fails < 3; fails++) {
         try {
             let status = await scraper(itterStart, itterEnd);
             if (await status === true) {
