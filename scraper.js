@@ -109,7 +109,6 @@ async function log_in_platt(browser) {
     console.log("logging in to platt");
     const page = await browser.newPage();
     await page.setRequestInterception(true);
-    // disable css fonts and images from loading
     page.on('request', (req) => {
       if (req.resourceType() === 'stylesheet' || req.resourceType() === 'font' || req.resourceType() === 'image') {
         req.abort();
@@ -143,6 +142,32 @@ async function log_in_platt(browser) {
   }
 }
 
+async function callParsePlatt(url, page) {
+  // loop is to retry parsePagePlatt 3 times if it fails.
+  // after three times or on successfull parse the loop will end
+  let finished = false;
+  for (let fails = 0; fails < 3 && !finished; fails++) {
+    try {
+        let plattObj = await parsePagePlatt(page);
+        if (plattObj) {
+          console.log("adding item to db");
+          console.log(plattObj);
+          plattItm(plattObj);
+          finished = true;
+        }
+        else {
+          console.log(url + " is not a product");
+          finished = true;
+        }
+    }
+    catch (e) {
+        console.log("something went wrong on url:" + url + ": error message: " + e)
+        console.log(fails < 3 ? "trying again." : "Aborting Page.");
+    }
+  }
+  return (finished);
+}
+
 module.exports = async function(itterStart, itterEnd) {
     const browser = await puppeteer.launch();
     const page = await log_in_platt(browser);
@@ -153,7 +178,7 @@ module.exports = async function(itterStart, itterEnd) {
       return false;
     }
     try {
-        for (i = itterStart; i <= itterEnd; i++) {
+        for (let i = itterStart; i <= itterEnd && failCount <= 10; i++) {
             console.log("your url:" + getUrl(i));
             var url = getUrl(i);
             try {
@@ -162,45 +187,21 @@ module.exports = async function(itterStart, itterEnd) {
             catch (e) {
               console.log("error orrcued going to a page. Message: " + e);
               failCount++;
-              if (failCount >= 6) {
+              if (failCount === 6) {
                 // failed more than 6 times. try the next url.
                 continue;
               }
               else if (failCount > 10) {
-                console.log("loading page has failed 10 times in a row. please check. closing broser");
-                browser.close();
+                console.log("loading page has failed 10 times. please check. closing broser");
+                page.close()
+                await browser.close();
                 return i;
               }
               // hasnt failed 6 times yet. trying same url.
               i--;
               continue;
             }
-            // loop is to retry parsePagePlatt 3 times if it fails.
-            // after three times or on successfull parse the loop will end
-            for (k = 0; k < 3; k++) {
-              try {
-                  let plattObj = await parsePagePlatt(page);
-                  if (plattObj) {
-                    console.log("adding item to db");
-                    console.log(plattObj);
-                    plattItm(plattObj);
-                    break;
-                  }
-                  else {
-                    console.log(url + " is not a product");
-                    break;
-                  }
-              }
-              catch (e) {
-                  console.log("something went wrong on url:" + url + ": error message: " + e)
-                  if (k < 3) {
-                    console.log("trying again.");
-                  }
-                  else {
-                    console.log("aborting page");
-                  }
-              }
-            }
+            await callParsePlatt(url, page);
             failCount = 0;
         }
     }

@@ -78,6 +78,9 @@ function plattItm(plattObj) {
   let sql = "SELECT id FROM platt_products WHERE platt_id=?;";
   result=pool.query(sql, plattObj.plattItemId, (err, result) => {
     console.log(result);
+    if (err) {
+      console.log(err);
+    }
     if (result.length >= 1) {
       console.log("updating existing platt product");
       updatePlattItm(plattObj);
